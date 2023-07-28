@@ -16,6 +16,8 @@ namespace kiko {
 		void Update();
 		void AddAudio(const std::string& name, const std::string& filename);
 		void Play(const std::string& name, bool loop = false);
+		void Stop(const std::string& name);
+
 
 	private:
 

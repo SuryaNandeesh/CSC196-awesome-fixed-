@@ -1,4 +1,5 @@
 #include "SpaceGame.h"
+#include "Framework/Game.h"
 
 #include "Player.h"
 #include "Enemy.h"
@@ -32,7 +33,10 @@ bool SpaceGame::Initialize() {
 	g_audioSystem.AddAudio("laser", "laser.wav");
 	g_audioSystem.AddAudio("death", "bwomp.wav");
 	g_audioSystem.AddAudio("Background Music", "08 Red Sun (Maniac Agenda Mix).mp3");
+	g_audioSystem.AddAudio("Low Health Music", "Critical Health.mp3");
+	g_audioSystem.AddAudio("gameover", "gameover.mp3");
     kiko::g_audioSystem.Play("Background Music", true);
+    
 
     m_scene = std::make_unique<Scene>();
 
@@ -51,33 +55,40 @@ void SpaceGame::Update(float dt) {
 
 	case SpaceGame::Title:
 
-       if (g_inputSystem.GetKeyDown(SDL_SCANCODE_SPACE))
+        if (g_inputSystem.GetKeyDown(SDL_SCANCODE_SPACE))
+        {
             m_state = eState::StateGame;
-
+        }
+        
 		break;
 
 	case SpaceGame::StateGame:
 
         m_score = 0;
-        m_lives = 0;
+        m_lives = 3;
         m_state = eState::StartLevel;
 
 		break;
 
 	case SpaceGame::StartLevel:
         //create ship
-        m_scene->Add(std::make_unique<Player>(
+    {
+        std::unique_ptr<Player> player = std::make_unique<Player>(
             100.0f,
             10.0f,
             DegToRad(270.0f),
-            Transform{ {400, 300}, 0, 3 },
-            g_manager.Get("ship.txt"), 
+            kiko::Transform{ {400, 300}, 0, 3 },
+            kiko::g_manager.Get("ship.txt"),
             "Player",
             0.95f
-            ));
+        );
+        player->m_game = this;
+        m_scene->Add(std::move(player));
+    }
 
         m_state = eState::Game;
 
+        
 		break;
 
 	case SpaceGame::Game:
@@ -104,13 +115,28 @@ void SpaceGame::Update(float dt) {
                 ));
 
         }
+        
 
 		break;
 
 	case SpaceGame::PlayerDead:
+        if (m_lives == 3) {
+            m_state = eState::StartLevel;
+        }else if (m_lives == 2) {
+            g_audioSystem.Play("Low Health Music", false);
+            m_state = eState::StartLevel;
+        }else if (m_lives == 1) {
+           
+            m_state = eState::GameOver;
+        }
+        m_lives--;
 		break;
 
 	case SpaceGame::GameOver:
+        if (m_state = eState::GameOver) {
+            g_audioSystem.Play("gameover", false);
+            break;
+        }
 		break;
 
 	default:
@@ -122,9 +148,8 @@ void SpaceGame::Update(float dt) {
     m_livesText->Create(g_renderer, "Lives " + std::to_string(m_lives), { 207, 34, 25, 1 });
 
     m_scene->Update(dt);
-    g_particleSystem.Update(dt);
+    kiko::g_particleSystem.Update(dt);
     
-
 }
 
 void SpaceGame::Draw(kiko::Renderer& renderer) {
@@ -133,10 +158,11 @@ void SpaceGame::Draw(kiko::Renderer& renderer) {
     {
         m_titleText->Draw(g_renderer, 350, 300);
     }
-    
+
     m_scene->Draw(renderer);
-    g_particleSystem.Draw(renderer);
+    kiko::g_particleSystem.Draw(renderer);
     m_scoreText->Draw(g_renderer, 40, 20);
     m_livesText->Draw(g_renderer, 700, 20);
     
+
 }

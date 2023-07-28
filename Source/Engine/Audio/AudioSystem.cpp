@@ -54,4 +54,15 @@ namespace kiko {
 
 	}
 
+	void AudioSystem::Stop(const std::string& name)
+	{
+		auto iter = m_sounds.find(name);
+		if (iter != m_sounds.end()) {
+
+			FMOD::Sound* sound = iter->second;
+			sound->release();
+	
+		}
+	}
+
 }

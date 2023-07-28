@@ -25,6 +25,8 @@ public:
 	virtual void Update(float dt) override;
 	virtual void Draw(kiko::Renderer& renderer) override;
 
+	void SetState(eState state) { m_state = state; }
+
 private:
 
 	eState m_state = eState::Title;

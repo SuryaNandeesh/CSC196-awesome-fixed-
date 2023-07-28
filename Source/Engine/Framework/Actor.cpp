@@ -9,6 +9,7 @@ namespace kiko {
 
 		if (m_health <= 0 && m_health != -1.0f) {
 			m_destroyed = true;
+			
 		}
 
 		m_transform.position += m_velocity * dt;

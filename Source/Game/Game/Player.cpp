@@ -1,6 +1,6 @@
 #include "Player.h"
 #include "Projectile.h"
-
+#include "SpaceGame.h"
 #include "Framework/Scene.h"
 #include "Input/InputSystem.h"
 #include "Audio/AudioSystem.h"
@@ -28,7 +28,10 @@ void Player::Update(float dt) {
     m_transform.position.x = kiko::Wrap(m_transform.position.x, kiko::g_renderer.GetWidth());
     m_transform.position.y = kiko::Wrap(m_transform.position.y, kiko::g_renderer.GetHeight());
 
-
+    if (m_health <= 0)
+    {
+        dynamic_cast<SpaceGame*>(m_game)->SetState(SpaceGame::eState::PlayerDead);
+    }
 
     if (kiko::g_inputSystem.GetKeyDown(SDL_SCANCODE_SPACE) && !kiko::g_inputSystem.GetPreviousKeyDown(SDL_SCANCODE_SPACE)) {
 
@@ -50,4 +53,5 @@ void Player::Update(float dt) {
 
 void Player::OnCollision(Actor* other)
 {
+    // this was placed inside of the actor.cpp
 }
