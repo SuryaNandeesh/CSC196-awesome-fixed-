@@ -21,22 +21,24 @@ bool SpaceGame::Initialize() {
     m_font = std::make_shared<Font>("ARCADECLASSIC.ttf", 24);
 
 	m_scoreText = std::make_unique<Text>(m_font);
-    m_scoreText->Create(kiko::g_renderer, "Score: ", kiko::Color{ 1, 1, 1, 1 });
+    m_scoreText->Create(kiko::g_renderer, "SCORE ", kiko::Color{ 28, 163, 39, 1 });
 
 	m_livesText = std::make_unique<Text>(m_font);
-    m_livesText->Create(kiko::g_renderer, "Lives: ", kiko::Color{ 1, 1, 1, 1 });
+    m_livesText->Create(kiko::g_renderer, "LIVES ", kiko::Color{ 207, 34, 25, 1 });
 
     m_titleText = std::make_unique<Text>(m_font);
     m_titleText->Create(kiko::g_renderer, "ASTEROID", kiko::Color{ 1, 1, 1, 1 });
 
 	g_audioSystem.AddAudio("laser", "laser.wav");
+	g_audioSystem.AddAudio("death", "bwomp.wav");
+	g_audioSystem.AddAudio("Background Music", "08 Red Sun (Maniac Agenda Mix).mp3");
+    kiko::g_audioSystem.Play("Background Music", true);
 
     m_scene = std::make_unique<Scene>();
 
 	return true;
 
 }
-
 
 
 void SpaceGame::Shutdown() {
@@ -63,7 +65,7 @@ void SpaceGame::Update(float dt) {
 		break;
 
 	case SpaceGame::StartLevel:
-
+        //create ship
         m_scene->Add(std::make_unique<Player>(
             100.0f,
             10.0f,
@@ -80,12 +82,12 @@ void SpaceGame::Update(float dt) {
 
 	case SpaceGame::Game:
 
+        
         m_spawnTimer += dt;
-
         if (m_spawnTimer >= m_spawnTime) {
 
             m_spawnTimer = 0;
-
+            //create enemy
             m_scene->Add(std::make_unique <Enemy>(
                 20.0f,
                 randomf(10.0f, 20.0f),
@@ -115,20 +117,26 @@ void SpaceGame::Update(float dt) {
 		break;
 
 	}
-
-    m_scoreText->Create(g_renderer, "Score " + std::to_string(m_score), { 1, 1, 1, 1 });
+    
+    m_scoreText->Create(g_renderer, "Score " + std::to_string(m_score), { 28, 163, 39, 1 });
+    m_livesText->Create(g_renderer, "Lives " + std::to_string(m_lives), { 207, 34, 25, 1 });
 
     m_scene->Update(dt);
     g_particleSystem.Update(dt);
+    
 
 }
 
 void SpaceGame::Draw(kiko::Renderer& renderer) {
     
     if (m_state == eState::Title)
-        m_titleText->Draw(g_renderer, 400, 300);
+    {
+        m_titleText->Draw(g_renderer, 350, 300);
+    }
     
     m_scene->Draw(renderer);
     g_particleSystem.Draw(renderer);
+    m_scoreText->Draw(g_renderer, 40, 20);
+    m_livesText->Draw(g_renderer, 700, 20);
     
 }

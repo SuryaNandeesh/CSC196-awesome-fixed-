@@ -19,16 +19,18 @@ int main(int argc, char* argv[]) {
 
     /////Setup
 
+    //seeds random to make it constantly randomizing
     seedRandom((unsigned int)time(nullptr));
+    //file location
     setFilePath("assets");
     cout << getFilePath() << endl;
-
+    //creation of window
     g_renderer.Initialize();
-    g_renderer.CreateWindow("CSC195", 800, 600);
-
+    g_renderer.CreateWindow("CSC196", 800, 600);
+    //creates input system
     g_inputSystem.Initialize();
     g_audioSystem.Initialize();
-
+    //creates the game itself
     unique_ptr<SpaceGame> game = make_unique<SpaceGame>();
     game->Initialize();
 
@@ -38,7 +40,7 @@ int main(int argc, char* argv[]) {
         ///// Updates
 
         g_time.Tick();
-
+        //updates the audio and input every tick
         g_audioSystem.Update();
         g_inputSystem.Update();
         
